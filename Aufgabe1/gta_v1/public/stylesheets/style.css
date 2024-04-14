@@ -37,6 +37,7 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   display: flex;
   flex-direction: column;
+
   min-height: 100vh;
 }
 
@@ -46,7 +47,43 @@ a {
 
 /* ### TODO ### Styles for other HTML elements */
 
-/* ... your code here ... */
+
+
+
+
+fieldset  legend {
+  font-weight: bold;
+}
+
+ fieldset{
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  border-radius: 5px;
+
+  input {
+    padding: 5px;
+    margin-bottom: 15px;
+  }
+  label {
+    font-size: 0.8rem;
+    font-weight: bold;
+  
+  }
+
+  button {
+    padding: 5px;
+    background-color: #744097;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);	
+  }
+}
+
+
 
 
 /* Grid styles (no changes required) */
@@ -107,31 +144,108 @@ a {
 }
 
 
-/* ### TODO ### Styles for Header Component */
-
-/* ... your code here ... */
+/* Styles for Header / Footer Component */
 
 
-/* ### TODO ### Styles for Main Component */
+header, footer {
+  background-color: var(--background-color);
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
 
-/* ... your code here ... */
+
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+
+  img{
+    width: 50px;
+    aspect-ratio: 1 / 1;
+  }
+
+  a {
+    color: var(--link-color);
+    text-decoration: none;
+    font-weight: bold;
+
+    &:hover{
+      text-decoration: underline;
+    
+    }
+  }
+  
+}
+
+footer {
+  margin-top: auto;
+}
+
+
+/*  Styles for Main component */
+.main{
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
 
 
 /* ### TODO ### Styles for Tagging component */
 
-/* ... your code here ... */
 
 
 /* ### TODO ### Styles for Discovery component */
 
-/* ... your code here ... */
+
+.discovery__wrapper{
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  padding: 1rem;
+
+  .discovery__taglist {
+
+    .discovery__results{
+      display: flex;
+      flex-direction: column;
+      flex-wrap: wrap;
+      list-style: none;
+      
+      
+      & > li {
+        flex: 1 1 auto;
+        padding: 1rem;
+        border: 1px solid #744097;
+        border-radius: 5px;
+        background-color: #00aeff65;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        margin: 0.5rem;
+        font-weight: bold;
+        
+      }
+    }
+  
+  }
+  
+  .discovery__map{
+    display: flex;
+    flex-direction: column;
+  }
+}
 
 
-/* ### TODO ### Styles for Footer Component */
-
-/* ... your code here ... */
 
 
-/* ### TODO ### Media Queries */
+/*Media Queries */
 
-/* ... your code here ... */
+
+
+@media (max-width: 860px) {
+  .main{
+    grid-template-columns: 1fr;
+  }
+}
