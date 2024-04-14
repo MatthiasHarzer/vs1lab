@@ -62,8 +62,13 @@ fieldset  legend {
   border-radius: 5px;
 
   input {
-    padding: 5px;
+    padding: 7px;
     margin-bottom: 15px;
+    border: 1px solid #cdcdcd;
+
+    &:read-only{
+      background-color: #f0f0f0;
+    }
   }
   label {
     font-size: 0.8rem;
