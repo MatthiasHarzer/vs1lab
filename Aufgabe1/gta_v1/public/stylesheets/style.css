@@ -20,16 +20,14 @@ html {
   box-sizing: inherit;
 }
 
-
 /* Variables (example: see declaration for "a" below) */
 
 :root {
-  --link-color: #00B7FF;
+  --link-color: #00b7ff;
   --background-color: #efefef;
   --border-color: #cdcdcd;
   --gray-color: #666;
 }
-
 
 /* HTML element styles */
 
@@ -47,15 +45,11 @@ a {
 
 /* ### TODO ### Styles for other HTML elements */
 
-
-
-
-
-fieldset  legend {
+fieldset legend {
   font-weight: bold;
 }
 
- fieldset{
+fieldset {
   display: flex;
   flex-direction: column;
   padding: 5px;
@@ -66,14 +60,14 @@ fieldset  legend {
     margin-bottom: 15px;
     border: 1px solid #cdcdcd;
 
-    &:read-only{
+    &:read-only {
       background-color: #f0f0f0;
     }
   }
+
   label {
     font-size: 0.8rem;
     font-weight: bold;
-  
   }
 
   button {
@@ -84,12 +78,9 @@ fieldset  legend {
     cursor: pointer;
     font-weight: bold;
     border-radius: 5px;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);	
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   }
 }
-
-
-
 
 /* Grid styles (no changes required) */
 
@@ -148,17 +139,14 @@ fieldset  legend {
   width: calc(100% - 1rem);
 }
 
-
 /* Styles for Header / Footer Component */
 
-
-header, footer {
+header,
+footer {
   background-color: var(--background-color);
   padding: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
-
-
 
 header {
   display: flex;
@@ -166,7 +154,7 @@ header {
   align-items: center;
   padding: 15px;
 
-  img{
+  img {
     width: 50px;
     aspect-ratio: 1 / 1;
   }
@@ -176,81 +164,69 @@ header {
     text-decoration: none;
     font-weight: bold;
 
-    &:hover{
+    &:hover {
       text-decoration: underline;
-    
     }
   }
-  
 }
 
 footer {
   margin-top: auto;
 }
 
-
 /*  Styles for Main component */
-.main{
+.main {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 1rem;
   padding: 1rem;
 }
 
-
-
 /* ### TODO ### Styles for Tagging component */
-
-
 
 /* ### TODO ### Styles for Discovery component */
 
-
-.discovery__wrapper{
+.discovery__wrapper {
   display: flex;
   flex-direction: row;
   gap: 1rem;
   padding: 1rem;
 
   .discovery__taglist {
-
-    .discovery__results{
+    .discovery__results {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
       list-style: none;
-      
-      
-      & > li {
+
+      &>li {
         flex: 1 1 auto;
         padding: 1rem;
         border: 1px solid #744097;
         border-radius: 5px;
         background-color: #00aeff65;
-        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
         margin: 0.5rem;
         font-weight: bold;
-        
       }
     }
-  
   }
-  
-  .discovery__map{
+
+  .discovery__map {
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
+
+    span {
+      color: #666;
+    }
   }
 }
 
-
-
-
 /*Media Queries */
 
-
-
 @media (max-width: 860px) {
-  .main{
+  .main {
     grid-template-columns: 1fr;
   }
 }
