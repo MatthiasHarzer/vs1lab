@@ -18,6 +18,7 @@ console.log("The geoTagging script is going to start...");
 /**
  * A class to help using the HTML5 Geolocation API.
  */
+
 class LocationHelper {
   // Location values for latitude and longitude are private properties to protect them from changes.
   #latitude = "";
@@ -47,74 +48,85 @@ class LocationHelper {
     if (!geoLocationApi) {
       throw new Error("The GeoLocation API is unavailable.");
     }
+   /**
+    * Create LocationHelper instance if coordinates are known.
+    * @param {string} latitude 
+    * @param {string} longitude 
+    */
+   constructor(latitude, longitude) {
+       this.#latitude = (parseFloat(latitude)).toFixed(5);
+       this.#longitude = (parseFloat(longitude)).toFixed(5);
+   }
 
-    // Call to the HTML5 geolocation API.
-    // Takes a first callback function as argument that is called in case of success.
-    // Second callback is optional for handling errors.
-    // These callbacks are given as arrow function expressions.
-    geoLocationApi.getCurrentPosition(
-      (location) => {
-        // Create and initialize LocationHelper object.
-        let helper = new LocationHelper();
-        helper.#latitude = location.coords.latitude.toFixed(5);
-        helper.#longitude = location.coords.longitude.toFixed(5);
-        // Pass the locationHelper object to the callback.
-        callback(helper);
-      },
-      (error) => {
-        alert(error.message);
-      }
-    );
-  }
+    /**
+     * The 'findLocation' method requests the current location details through the geolocation API.
+     * It is a static method that should be used to obtain an instance of LocationHelper.
+     * Throws an exception if the geolocation API is not available.
+     * @param {*} callback a function that will be called with a LocationHelper instance as parameter, that has the current location details
+     */
+    static findLocation(callback) {
+        const geoLocationApi = navigator.geolocation;
+
+        if (!geoLocationApi) {
+            throw new Error("The GeoLocation API is unavailable.");
+        }
+
+        // Call to the HTML5 geolocation API.
+        // Takes a first callback function as argument that is called in case of success.
+        // Second callback is optional for handling errors.
+        // These callbacks are given as arrow function expressions.
+        geoLocationApi.getCurrentPosition((location) => {
+            // Create and initialize LocationHelper object.
+            let helper = new LocationHelper(location.coords.latitude, location.coords.longitude);
+            // Pass the locationHelper object to the callback.
+            callback(helper);
+        }, (error) => {
+           alert(error.message)
+        });
+    }
 }
 
 /**
- * A class to help using the MapQuest map service.
+ * A class to help using the Leaflet map service.
  */
 class MapManager {
-  #apiKey = "";
+    #map
+    #markers
 
-  /**
-   * Create a new MapManager instance.
-   * @param {string} apiKey Your MapQuest API Key
-   */
-  constructor(apiKey) {
-    this.#apiKey = apiKey;
-  }
-
-  /**
-   * Generate a MapQuest image URL for the specified parameters.
-   * @param {number} latitude The map center latitude
-   * @param {number} longitude The map center longitude
-   * @param {{latitude, longitude, name}[]} tags The map tags, defaults to just the current location
-   * @param {number} zoom The map zoom, defaults to 14
-   * @returns {string} URL of generated map
-   */
-  getMapUrl(latitude, longitude, tags = [], zoom = 14) {
-    if (this.#apiKey === "") {
-      console.log("No API key provided.");
-      return "images/mapview.jpg";
+    /**
+    * Initialize a Leaflet map
+    * @param {number} latitude The map center latitude
+    * @param {number} longitude The map center longitude
+    * @param {number} zoom The map zoom, defaults to 18
+    */
+    initMap(latitude, longitude, zoom = 18) {
+        // set up dynamic Leaflet map
+        this.#map = L.map('map').setView([latitude, longitude], zoom);
+        var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
+        L.tileLayer(
+            'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; ' + mapLink + ' Contributors'}).addTo(this.#map);
+        this.#markers = L.layerGroup().addTo(this.#map);
     }
 
-    const tagList = tags.reduce(
-      (acc, tag) =>
-        `${acc}markers=color:red|label:${tag.name[0]}|${tag.latitude},${tag.longitude}&`,
-      ""
-    );
-
-    // const mapQuestUrl = `https://www.mapquestapi.com/staticmap/v5/map?key=${
-    //   this.#apiKey
-    // }&size=600,400&zoom=${zoom}&center=${latitude},${longitude}&locations=${tagList}`;
-    const styledUrl =
-      "https://maps.googleapis.com/maps/api/staticmap?maptype=roadmap&style=element:geometry%7Ccolor:0xebe3cd&style=element:labels.text.fill%7Ccolor:0x523735&style=element:labels.text.stroke%7Ccolor:0xf5f1e6&style=feature:administrative%7Celement:geometry.stroke%7Ccolor:0xc9b2a6&style=feature:administrative.land_parcel%7Celement:geometry.stroke%7Ccolor:0xdcd2be&style=feature:administrative.land_parcel%7Celement:labels%7Cvisibility:off&style=feature:administrative.land_parcel%7Celement:labels.text.fill%7Ccolor:0xae9e90&style=feature:landscape.natural%7Celement:geometry%7Ccolor:0xdfd2ae&style=feature:poi%7Celement:geometry%7Ccolor:0xdfd2ae&style=feature:poi%7Celement:labels%7Cvisibility:off&style=feature:poi%7Celement:labels.text.fill%7Ccolor:0x93817c&style=feature:poi.park%7Celement:geometry.fill%7Ccolor:0xa5b076&style=feature:poi.park%7Celement:labels.text.fill%7Ccolor:0x447530&style=feature:road%7Celement:geometry%7Ccolor:0xf5f1e6&style=feature:road.arterial%7Celement:geometry%7Ccolor:0xfdfcf8&style=feature:road.highway%7Celement:geometry%7Ccolor:0xf8c967&style=feature:road.highway%7Celement:geometry.stroke%7Ccolor:0xe9bc62&style=feature:road.highway.controlled_access%7Celement:geometry%7Ccolor:0xe98d58&style=feature:road.highway.controlled_access%7Celement:geometry.stroke%7Ccolor:0xdb8555&style=feature:road.local%7Celement:labels%7Cvisibility:off&style=feature:road.local%7Celement:labels.text.fill%7Ccolor:0x806b63&style=feature:transit.line%7Celement:geometry%7Ccolor:0xdfd2ae&style=feature:transit.line%7Celement:labels.text.fill%7Ccolor:0x8f7d77&style=feature:transit.line%7Celement:labels.text.stroke%7Ccolor:0xebe3cd&style=feature:transit.station%7Celement:geometry%7Ccolor:0xdfd2ae&style=feature:transit.station%7Celement:labels.icon%7Cvisibility:off&style=feature:water%7Celement:geometry.fill%7Ccolor:0xb9d3c2&style=feature:water%7Celement:labels.text.fill%7Ccolor:0x92998d";
-    const url = `${styledUrl}&key=${
-      this.#apiKey
-    }&size=500x400&center=${latitude},${longitude}&zoom=${zoom}&${tagList}`;
-
-    console.log("Generated MapQuest URL:", url);
-
-    return url;
-  }
+    /**
+    * Update the Markers of a Leaflet map
+    * @param {number} latitude The map center latitude
+    * @param {number} longitude The map center longitude
+    * @param {{latitude, longitude, name}[]} tags The map tags, defaults to just the current location
+    */
+    updateMarkers(latitude, longitude, tags = []) {
+        // delete all markers
+        this.#markers.clearLayers();
+        L.marker([latitude, longitude])
+            .bindPopup("Your Location")
+            .addTo(this.#markers);
+        for (const tag of tags) {
+            L.marker([tag.location.latitude,tag.location.longitude])
+                .bindPopup(tag.name)
+                .addTo(this.#markers);  
+        }
+    }
 }
 
 /**
