@@ -1,34 +1,53 @@
+import { GOOGLE_MAPS_STATIS_API_KEY } from "./secrets.js";
 // File origin: VS1LAB A2
 
 /* eslint-disable no-unused-vars */
 
 // This script is executed when the browser loads index.html.
 
-// "console.log" writes to the browser's console. 
+// "console.log" writes to the browser's console.
 // The console window must be opened explicitly in the browser.
 // Try to find this output in the browser...
 console.log("The geoTagging script is going to start...");
 
 /**
-  * A class to help using the HTML5 Geolocation API.
-  */
+ * @callback findLocationCallback
+ * @param {LocationHelper} locationHelper
+ */
+
+/**
+ * A class to help using the HTML5 Geolocation API.
+ */
+
 class LocationHelper {
-    // Location values for latitude and longitude are private properties to protect them from changes.
-    #latitude = '';
+  // Location values for latitude and longitude are private properties to protect them from changes.
+  #latitude = "";
 
-    /**
-     * Getter method allows read access to privat location property.
-     */
-    get latitude() {
-        return this.#latitude;
+  /**
+   * Getter method allows read access to privat location property.
+   */
+  get latitude() {
+    return this.#latitude;
+  }
+
+  #longitude = "";
+
+  get longitude() {
+    return this.#longitude;
+  }
+
+  /**
+   * The 'findLocation' method requests the current location details through the geolocation API.
+   * It is a static method that should be used to obtain an instance of LocationHelper.
+   * Throws an exception if the geolocation API is not available.
+   * @param {findLocationCallback} callback a function that will be called with a LocationHelper instance as parameter, that has the current location details
+   */
+  static findLocation(callback) {
+    const geoLocationApi = navigator.geolocation;
+
+    if (!geoLocationApi) {
+      throw new Error("The GeoLocation API is unavailable.");
     }
-
-    #longitude = '';
-
-    get longitude() {
-        return this.#longitude;
-    }
-
    /**
     * Create LocationHelper instance if coordinates are known.
     * @param {string} latitude 
@@ -71,7 +90,6 @@ class LocationHelper {
  * A class to help using the Leaflet map service.
  */
 class MapManager {
-
     #map
     #markers
 
@@ -116,9 +134,34 @@ class MapManager {
  * A function to retrieve the current location and update the page.
  * It is called once the page has been fully loaded.
  */
-// ... your code here ...
+/**
+ * @type {HTMLInputElement}
+ */
+const latitudeElement = document.querySelector("#tag-lat");
+/**
+ * @type {HTMLInputElement}
+ */
+const longitudeElement = document.querySelector("#tag-lon");
+/**
+ * @type {HTMLImageElement}
+ */
+const mapPreviewElement = document.querySelector("#mapView");
+
+function updateLocation() {
+  LocationHelper.findLocation((helper) => {
+    latitudeElement.value = helper.latitude;
+    longitudeElement.value = helper.longitude;
+
+    const mapManager = new MapManager(GOOGLE_MAPS_STATIS_API_KEY);
+    mapPreviewElement.src = mapManager.getMapUrl(
+      helper.latitude,
+      helper.longitude
+    );
+  });
+}
 
 // Wait for the page to fully load its DOM content, then call updateLocation
 document.addEventListener("DOMContentLoaded", () => {
-    alert("Please change the script 'geotagging.js'");
+  // alert("Please change the script 'geotagging.js'");
+  updateLocation();
 });
