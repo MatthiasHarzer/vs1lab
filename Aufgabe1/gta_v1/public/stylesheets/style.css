@@ -199,7 +199,7 @@ footer {
       flex-wrap: wrap;
       list-style: none;
 
-      &>li {
+      & > li {
         flex: 1 1 auto;
         padding: 1rem;
         border: 1px solid #744097;
@@ -219,6 +219,10 @@ footer {
 
     span {
       color: #666;
+    }
+
+    #mapView {
+      width: 100%;
     }
   }
 }
