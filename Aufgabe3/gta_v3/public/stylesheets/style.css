@@ -189,7 +189,8 @@ footer {
 .discovery__wrapper {
   display: flex;
   flex-direction: row;
-  gap: 1rem;
+  justify-content: space-between;
+  /* gap: 1rem; */
   padding: 1rem;
 
   .discovery__taglist {
@@ -220,7 +221,15 @@ footer {
     span {
       color: #666;
     }
+
+    #mapView {
+      width: 100%;
+    }
   }
+}
+
+#map {
+  height: 500px;
 }
 
 /*Media Queries */
@@ -229,9 +238,12 @@ footer {
   .main {
     grid-template-columns: 1fr;
   }
-}
 
-#map {
-  height: 400px;
-  width: 400px;
+  .discovery__wrapper {
+    flex-direction: column;
+
+    & > div {
+      width: 100%;
+    }
+  }
 }

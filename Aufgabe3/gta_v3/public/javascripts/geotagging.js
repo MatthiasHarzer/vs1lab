@@ -137,18 +137,22 @@ const latitudeElement = document.querySelector("#tag-lat");
 const longitudeElement = document.querySelector("#tag-lon");
 const mapPreviewElement = document.querySelector("#mapPreview");
 const mapPreviewLabelElement = document.querySelector("#mapPreviewLabel");
+const hiddenLatitudeElement = document.querySelector("#tag-lat-df");
+const hiddenLongitudeElement = document.querySelector("#tag-lon-df");
 
 function updateLocation() {
-  LocationHelper.findLocation((helper) => {
-    latitudeElement.value = helper.latitude;
-    longitudeElement.value = helper.longitude;
+  LocationHelper.findLocation(({ latitude, longitude }) => {
+    latitudeElement.value = latitude;
+    longitudeElement.value = longitude;
+    hiddenLatitudeElement.value = latitude;
+    hiddenLongitudeElement.value = longitude;
 
     mapPreviewElement.remove();
     mapPreviewLabelElement.remove();
 
     const mapManager = new MapManager();
-    mapManager.initMap(helper.latitude, helper.longitude);
-    mapManager.updateMarkers(helper.latitude, helper.longitude);
+    mapManager.initMap(latitude, longitude);
+    mapManager.updateMarkers(latitude, longitude);
   });
 }
 
