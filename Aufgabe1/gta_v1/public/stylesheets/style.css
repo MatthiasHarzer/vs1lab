@@ -189,7 +189,8 @@ footer {
 .discovery__wrapper {
   display: flex;
   flex-direction: row;
-  gap: 1rem;
+  justify-content: space-between;
+  /* gap: 1rem; */
   padding: 1rem;
 
   .discovery__taglist {
@@ -199,7 +200,7 @@ footer {
       flex-wrap: wrap;
       list-style: none;
 
-      & > li {
+      &>li {
         flex: 1 1 auto;
         padding: 1rem;
         border: 1px solid #744097;
@@ -232,5 +233,13 @@ footer {
 @media (max-width: 860px) {
   .main {
     grid-template-columns: 1fr;
+  }
+
+  .discovery__wrapper {
+    flex-direction: column;
+
+    &>div {
+      width: 100%;
+    }
   }
 }
