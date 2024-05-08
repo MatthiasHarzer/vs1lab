@@ -1,3 +1,9 @@
+The lecture "Distributed systems" focuses on teaching fundamentals about web development.
+
+Information about each assignment can be found in their respective folder as well as below.
+
+> Lecture "Verteilte Systeme 1" by Prof. Dr. Christian Zirpins at the [HKA](https://h-ka.de/) 2024
+
 # VS1lab - Laborübungen Verteilte Systeme 1
 
 Ziel des Labors ist die praktische Anwendung verschiedener Web Technologien aus der Vorlesung. Dazu wird in mehreren Schritten eine komplette Web Anwendung erstellt. In jedem Schritt wird jeweils ein Bereich von Web Technologien genauer betrachtet.
