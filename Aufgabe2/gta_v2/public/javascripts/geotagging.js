@@ -123,11 +123,6 @@ class MapManager {
 }
 
 /**
- * TODO: 'updateLocation'
- * A function to retrieve the current location and update the page.
- * It is called once the page has been fully loaded.
- */
-/**
  * @type {HTMLInputElement}
  */
 const latitudeElement = document.querySelector("#tag-lat");
@@ -140,6 +135,10 @@ const mapPreviewLabelElement = document.querySelector("#mapPreviewLabel");
 const hiddenLatitudeElement = document.querySelector("#tag-lat-df");
 const hiddenLongitudeElement = document.querySelector("#tag-lon-df");
 
+/**
+ * A function to retrieve the current location and update the page.
+ * It is called once the page has been fully loaded.
+ */
 function updateLocation() {
   LocationHelper.findLocation(({ latitude, longitude }) => {
     latitudeElement.value = latitude;
