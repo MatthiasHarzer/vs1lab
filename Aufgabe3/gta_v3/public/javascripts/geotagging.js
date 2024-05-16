@@ -27,25 +27,35 @@ const mapPreviewElement = document.querySelector("#mapPreview");
 const mapPreviewLabelElement = document.querySelector("#mapPreviewLabel");
 const hiddenLatitudeElement = document.querySelector("#tag-lat-df");
 const hiddenLongitudeElement = document.querySelector("#tag-lon-df");
+const mapElement = document.querySelector("#map");
 
-function updateLocation() {
-  LocationHelper.findLocation(({ latitude, longitude }) => {
-    latitudeElement.value = latitude;
-    longitudeElement.value = longitude;
-    hiddenLatitudeElement.value = latitude;
-    hiddenLongitudeElement.value = longitude;
+function updateLocation(latitude, longitude) {
+  latitudeElement.value = latitude;
+  longitudeElement.value = longitude;
+  hiddenLatitudeElement.value = latitude;
+  hiddenLongitudeElement.value = longitude;
 
-    mapPreviewElement.remove();
-    mapPreviewLabelElement.remove();
+  mapPreviewElement.remove();
+  mapPreviewLabelElement.remove();
 
-    const mapManager = new MapManager();
-    mapManager.initMap(latitude, longitude);
-    mapManager.updateMarkers(latitude, longitude);
-  });
+  const tags = JSON.parse(mapElement.dataset.tags);
+
+  const mapManager = new MapManager();
+  mapManager.initMap(latitude, longitude);
+  mapManager.updateMarkers(latitude, longitude, tags);
 }
 
 // Wait for the page to fully load its DOM content, then call updateLocation
 document.addEventListener("DOMContentLoaded", () => {
   // alert("Please change the script 'geotagging.js'");
-  updateLocation();
+
+  const prefilledLatitude = latitudeElement.value;
+  const prefilledLongitude = longitudeElement.value;
+
+  if (prefilledLatitude && prefilledLongitude) {
+    console.log("Using prefilled coordinates...");
+    updateLocation(prefilledLatitude, prefilledLongitude);
+  } else {
+    LocationHelper.findLocation(({ latitude, longitude }) => updateLocation(latitude, longitude));
+  }
 });

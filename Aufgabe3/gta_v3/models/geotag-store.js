@@ -55,8 +55,8 @@ class InMemoryGeoTagStore {
    */
   getNearbyGeoTags(latitude, longitude) {
     return this.#tags.filter((tag) => {
-      const latDiff = Math.abs(tag.latitude - latitude);
-      const lonDiff = Math.abs(tag.longitude - longitude);
+      const latDiff = Math.abs(tag.location.latitude - latitude);
+      const lonDiff = Math.abs(tag.location.longitude - longitude);
       return (
         latDiff <= this.#proximityDistance && lonDiff < this.#proximityDistance
       );

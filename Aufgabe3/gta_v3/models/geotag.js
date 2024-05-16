@@ -4,6 +4,12 @@
  * This script is a template for exercise VS1lab/Aufgabe3
  * Complete all TODOs in the code documentation.
  */
+/**
+ * @typedef {Object} Location
+ * @property {number} latitude
+ * @property {number} longitude
+ 
+ */
 
 /** *
  * A class representing geotags.
@@ -21,14 +27,14 @@ class GeoTag {
      * @type {string}
      */
     this.name = name;
+
     /**
-     * @type {number}
+     * @type {Location}
      */
-    this.latitude = latitude;
-    /**
-     * @type {number}
-     */
-    this.longitude = longitude;
+    this.location = {
+      latitude: latitude,
+      longitude: longitude,
+    }
     /**
      * @type {string}
      */
