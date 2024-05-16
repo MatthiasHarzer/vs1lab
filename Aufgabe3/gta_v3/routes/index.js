@@ -43,7 +43,6 @@ for (const [name, lat, lon, hashtag] of GeoTagExamples.tagList) {
  * As response, the ejs-template is rendered without geotag objects.
  */
 
-// TODO: extend the following route example if necessary
 router.get("/", (req, res) => {
   res.render("index", { taglist: [] });
 });
@@ -62,8 +61,15 @@ router.get("/", (req, res) => {
  * To this end, "GeoTagStore" provides a method to search geotags
  * by radius around a given location.
  */
+router.post("/tagging", (req, res) => {
+  const { name, latitude, longitude, hashtag } = req.body;
+  const newTag = new GeoTag(name, latitude, longitude, hashtag);
+  db.addGeoTag(newTag);
 
-// TODO: ... your code here ...
+  const proximityTags = db.getNearbyGeoTags(latitude, longitude);
+
+  res.render("index", { taglist: proximityTags });
+});
 
 /**
  * Route '/discovery' for HTTP 'POST' requests.
@@ -80,7 +86,10 @@ router.get("/", (req, res) => {
  * To this end, "GeoTagStore" provides methods to search geotags
  * by radius and keyword.
  */
-
-// TODO: ... your code here ...
+router.post("/discovery", (req, res) => {
+  const { search, latitude, longitude } = req.body;
+  const matchingTags = db.searchNearbyGeoTags(latitude, longitude, search);
+  res.render("index", { taglist: matchingTags });
+});
 
 module.exports = router;

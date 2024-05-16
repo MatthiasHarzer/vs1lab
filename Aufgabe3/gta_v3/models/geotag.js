@@ -10,6 +10,12 @@
  * GeoTag objects should contain at least all fields of the tagging form.
  */
 class GeoTag {
+  /**
+   * @param {string} name
+   * @param {number} latitude
+   * @param {number} longitude
+   * @param {string} hashtag
+   */
   constructor(name, latitude, longitude, hashtag) {
     /**
      * @type {string}
