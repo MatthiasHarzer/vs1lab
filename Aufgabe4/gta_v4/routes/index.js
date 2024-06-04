@@ -10,23 +10,29 @@
  * Define module dependencies.
  */
 
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 /**
- * The module "geotag" exports a class GeoTagStore. 
+ * The module "geotag" exports a class GeoTagStore.
  * It represents geotags.
  */
 // eslint-disable-next-line no-unused-vars
-const GeoTag = require('../models/geotag');
+const GeoTag = require("../models/geotag");
 
 /**
- * The module "geotag-store" exports a class GeoTagStore. 
+ * The module "geotag-store" exports a class GeoTagStore.
  * It provides an in-memory store for geotag objects.
  */
 // eslint-disable-next-line no-unused-vars
-const GeoTagStore = require('../models/geotag-store');
+const GeoTagStore = require("../models/geotag-store");
+const GeoTagExamples = require("../models/geotag-examples");
 
+const db = new GeoTagStore();
+for (const [name, lat, lon, hashtag] of GeoTagExamples.tagList) {
+  const tag = new GeoTag(name, lat, lon, hashtag);
+  db.addGeoTag(tag);
+}
 // App routes (A3)
 
 /**
@@ -38,8 +44,8 @@ const GeoTagStore = require('../models/geotag-store');
  * As response, the ejs-template is rendered without geotag objects.
  */
 
-router.get('/', (req, res) => {
-  res.render('index', { taglist: [] })
+router.get("/", (req, res) => {
+  res.render("index", { taglist: [], longitude: null, latitude: null });
 });
 
 // API routes (A4)
@@ -58,7 +64,6 @@ router.get('/', (req, res) => {
 
 // TODO: ... your code here ...
 
-
 /**
  * Route '/api/geotags' for HTTP 'POST' requests.
  * (http://expressjs.com/de/4x/api.html#app.post.method)
@@ -72,7 +77,6 @@ router.get('/', (req, res) => {
 
 // TODO: ... your code here ...
 
-
 /**
  * Route '/api/geotags/:id' for HTTP 'GET' requests.
  * (http://expressjs.com/de/4x/api.html#app.get.method)
@@ -85,23 +89,21 @@ router.get('/', (req, res) => {
 
 // TODO: ... your code here ...
 
-
 /**
  * Route '/api/geotags/:id' for HTTP 'PUT' requests.
  * (http://expressjs.com/de/4x/api.html#app.put.method)
  *
  * Requests contain the ID of a tag in the path.
  * (http://expressjs.com/de/4x/api.html#req.params)
- * 
+ *
  * Requests contain a GeoTag as JSON in the body.
  * (http://expressjs.com/de/4x/api.html#req.query)
  *
  * Changes the tag with the corresponding ID to the sent value.
- * The updated resource is rendered as JSON in the response. 
+ * The updated resource is rendered as JSON in the response.
  */
 
 // TODO: ... your code here ...
-
 
 /**
  * Route '/api/geotags/:id' for HTTP 'DELETE' requests.
