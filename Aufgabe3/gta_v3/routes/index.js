@@ -44,7 +44,7 @@ for (const [name, lat, lon, hashtag] of GeoTagExamples.tagList) {
  */
 
 router.get("/", (req, res) => {
-  res.render("index", { taglist: [], longitude: null, latitude: null});
+  res.render("index", { taglist: [], longitude: null, latitude: null });
 });
 
 /**
@@ -89,7 +89,7 @@ router.post("/tagging", (req, res) => {
 router.post("/discovery", (req, res) => {
   const { search, latitude, longitude } = req.body;
   const matchingTags = db.searchNearbyGeoTags(latitude, longitude, search);
-  res.render("index", { taglist: matchingTags, longitude, latitude});
+  res.render("index", { taglist: matchingTags, longitude, latitude });
 });
 
 module.exports = router;

@@ -56,6 +56,8 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("Using prefilled coordinates...");
     updateLocation(prefilledLatitude, prefilledLongitude);
   } else {
-    LocationHelper.findLocation(({ latitude, longitude }) => updateLocation(latitude, longitude));
+    LocationHelper.findLocation(({ latitude, longitude }) =>
+      updateLocation(latitude, longitude)
+    );
   }
 });
