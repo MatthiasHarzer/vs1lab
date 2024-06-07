@@ -30,8 +30,7 @@ const GeoTagExamples = require("../models/geotag-examples");
 
 const db = new GeoTagStore();
 for (const [name, lat, lon, hashtag] of GeoTagExamples.tagList) {
-  const tag = new GeoTag(name, lat, lon, hashtag);
-  db.addGeoTag(tag);
+  db.addGeoTag(name, lat, lon, hashtag);
 }
 // App routes (A3)
 
@@ -57,12 +56,30 @@ router.get("/", (req, res) => {
  * Requests contain the fields of the Discovery form as query.
  * (http://expressjs.com/de/4x/api.html#req.query)
  *
- * As a response, an array with Geo Tag objects is rendered as JSON.
+ * As a response, an array with Geo Tag objects is rendered as JrsSON.
  * If 'searchterm' is present, it will be filtered by search term.
  * If 'latitude' and 'longitude' are available, it will be further filtered based on radius.
  */
+router.get("/api/geotags", (req, res) => {
+  const { searchterm, latitude, longitude } = req.query;
 
-// TODO: ... your code here ...
+  let tags;
+  if (latitude !== undefined && longitude !== undefined) {
+    tags = db.getNearbyGeoTags(latitude, longitude);
+  } else {
+    tags = db.getGeoTags();
+  }
+
+  if (searchterm) {
+    tags = tags.filter(
+      (tag) =>
+        tag.name.toLocaleLowerCase().includes(searchterm.toLowerCase()) ||
+        tag.hashtag.toLocaleLowerCase().includes(searchterm.toLowerCase())
+    );
+  }
+
+  res.send(tags);
+});
 
 /**
  * Route '/api/geotags' for HTTP 'POST' requests.
@@ -75,7 +92,12 @@ router.get("/", (req, res) => {
  * The new resource is rendered as JSON in the response.
  */
 
-// TODO: ... your code here ...
+router.post("/api/geotags", (req, res) => {
+  const { name, longitude, latitude, hashtag } = req.body;
+
+  const newTag = db.addGeoTag(name, latitude, longitude, hashtag);
+  res.send(newTag);
+});
 
 /**
  * Route '/api/geotags/:id' for HTTP 'GET' requests.
@@ -87,7 +109,12 @@ router.get("/", (req, res) => {
  * The requested tag is rendered as JSON in the response.
  */
 
-// TODO: ... your code here ...
+router.get("/api/geotags/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const tag = db.getGeoTag(id);
+
+  res.send(tag);
+});
 
 /**
  * Route '/api/geotags/:id' for HTTP 'PUT' requests.
@@ -103,7 +130,21 @@ router.get("/", (req, res) => {
  * The updated resource is rendered as JSON in the response.
  */
 
-// TODO: ... your code here ...
+router.put("/api/geotags/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const tag = db.getGeoTag(id);
+
+  const { name, longitude, latitude, hashtag } = req.body;
+
+  if (tag) {
+    tag.hashtag = hashtag;
+    tag.name = name;
+    tag.location.longitude = longitude;
+    tag.location.latitude = latitude;
+  }
+
+  res.send(tag);
+});
 
 /**
  * Route '/api/geotags/:id' for HTTP 'DELETE' requests.
@@ -116,6 +157,10 @@ router.get("/", (req, res) => {
  * The deleted resource is rendered as JSON in the response.
  */
 
-// TODO: ... your code here ...
+router.delete("/api/geotags/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const deleted = db.removeGeoTag(id);
+  res.send(deleted);
+});
 
 module.exports = router;

@@ -31,21 +31,48 @@ class InMemoryGeoTagStore {
    * @type {GeoTag[]}
    */
   #tags = [];
+  /**
+   * @type {number}
+   */
+  #tagId = 0;
 
   /**
-   * @param {GeoTag} geoTag
+   * @returns {GeoTag[]}
    */
-  addGeoTag(geoTag) {
-    this.#tags.push(geoTag);
+  getGeoTags() {
+    return this.#tags;
+  }
+
+  /**
+   * @param {number} id
+   * @returns {GeoTag}
+   */
+  getGeoTag(id) {
+    return this.#tags.find((tag) => tag.id === id);
   }
 
   /**
    * @param {string} name
+   * @param {number} latitude
+   * @param {number} longitude
+   * @param {string} hashtag
+   * @returns {GeoTag}
    */
-  removeGeoTag(name) {
-    const idx = this.#tags.findIndex((tag) => tag.name === name);
+  addGeoTag(name, latitude, longitude, hashtag) {
+    const tag = new GeoTag(this.#tagId++, name, latitude, longitude, hashtag);
+    this.#tags.push(tag);
+    return tag;
+  }
+
+  /**
+   * @param {number} id
+   */
+  removeGeoTag(id) {
+    const idx = this.#tags.findIndex((tag) => tag.id === id);
     if (idx < 0) return;
+    const tag = this.#tags[idx];
     this.#tags.splice(idx, 1);
+    return tag;
   }
 
   /**
