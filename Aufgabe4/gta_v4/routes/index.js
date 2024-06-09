@@ -44,7 +44,7 @@ for (const [name, lat, lon, hashtag] of GeoTagExamples.tagList) {
  */
 
 router.get("/", (req, res) => {
-  res.render("index", { taglist: [], longitude: null, latitude: null });
+  res.render("./index", {});
 });
 
 // API routes (A4)

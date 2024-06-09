@@ -62,7 +62,6 @@
               id="tag-lat"
               name="latitude"
               placeholder="e.g.  40.7483542"
-              value="<%= latitude %>"
               required
               readonly
             />
@@ -73,7 +72,6 @@
               id="tag-lon"
               name="longitude"
               placeholder="e.g. -73.9854418"
-              value="<%= longitude %>"
               required
               readonly
             />
@@ -114,47 +112,18 @@
               placeholder="e.g. New York"
               required
             />
-            <input
-              type="number"
-              id="tag-lat-df"
-              name="latitude"
-              placeholder="e.g.  40.7483542"
-              value="<%= latitude %>"
-              readonly
-              hidden
-            />
-            <input
-              type="number"
-              id="tag-lon-df"
-              name="longitude"
-              placeholder="e.g. -73.9854418"
-              value="<%= longitude %>"
-              readonly
-              hidden
-            />
 
-            <button type="submit">Search</button>
+            <button type="submit" id="discovery-btn">Search</button>
           </fieldset>
         </form>
         <!-- ############### VS1Lab 1a Form 2 End -->
 
         <div class="discovery__wrapper">
           <div class="discovery__taglist col-4">
-            <ul class="discovery__results" id="discoveryResults">
-              <% if (taglist !== undefined) taglist.forEach(function(gtag) { %>
-              <li>
-                <%= gtag.name %> ( <%= gtag.location.latitude %>,<%=
-                gtag.location.longitude %>) <%= gtag.hashtag %>
-              </li>
-              <% }); %>
-            </ul>
+            <ul class="discovery__results" id="discoveryResults"></ul>
           </div>
 
-          <div
-            class="discovery__map col-8"
-            id="map"
-            data-tags="<%= JSON.stringify(taglist) %>"
-          >
+          <div class="discovery__map col-8" id="map">
             <img
               src="./images/mapview.jpg"
               alt="a map with locations"

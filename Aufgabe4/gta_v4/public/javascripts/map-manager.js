@@ -29,6 +29,7 @@ export class MapManager {
    * @param {number} zoom The map zoom, defaults to 18
    */
   initMap(latitude, longitude, zoom = 18) {
+    if (this.#map) return;
     // set up dynamic Leaflet map
     this.#map = L.map("map").setView([latitude, longitude], zoom);
     var mapLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>';
