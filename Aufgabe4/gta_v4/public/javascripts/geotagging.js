@@ -12,18 +12,6 @@ import { LocationHelper } from "./location-helper.js";
 console.log("The geoTagging script is going to start...");
 
 /**
- * A function to retrieve the current location and update the page.
- * It is called once the page has been fully loaded.
- */
-/**
- * @type {HTMLInputElement}
- */
-const latitudeElement = document.querySelector("#tag-lat");
-/**
- * @type {HTMLInputElement}
- */
-const longitudeElement = document.querySelector("#tag-lon");
-/**
  * @type {HTMLInputElement}
  */
 const nameElement = document.querySelector("#tag-name");
@@ -36,12 +24,48 @@ const submitDiscoveryForm = document.querySelector("#discoveryFilterForm");
 const discoverySearch = document.querySelector("#discovery-search");
 const discoveryResults = document.querySelector("#discoveryResults");
 
+/**
+ * @typedef {Object} GeoTagSearchRequest
+ * @property {number} latitude
+ * @property {number} longitude
+ * @property {string} searchterm
+ */
+
+/**
+ * @typedef {Object} GeoTagsResponse
+ * @property {Array} tags
+ * @property {boolean} hasNext
+ * @property {boolean} hastPrev
+ * @property {number} page
+ * @property {number} totalPages
+ * @property {number} totalTags
+ * @property {GeoTagSearchRequest} request
+ */
+
 // Wait for the page to fully load its DOM content, then call updateLocation
 document.addEventListener("DOMContentLoaded", async () => {
   // alert("Please change the script 'geotagging.js'");
   const mapManager = new MapManager();
+  /**
+   * @type {GeoTagsResponse}
+   */
+  let tagData = {
+    tags: [],
+    hasNext: false,
+    hastPrev: false,
+    page: 0,
+    totalPages: 0,
+    totalTags: 0,
+  };
 
-  function updateDiscovery(latitude, longitude, tags) {
+  /**
+   *
+   * @param {number} latitude
+   * @param {number} longitude
+   * @param {GeoTagsResponse} tagData
+   */
+  function updateDiscovery(latitude, longitude, tagData) {
+    const { tags, hasNext, hastPrev, page, totalPages, totalTags } = tagData;
     mapManager.initMap(latitude, longitude);
     mapManager.updateMarkers(latitude, longitude, tags);
 
@@ -54,17 +78,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  const { latitude, longitude } = await LocationHelper.findLocation();
   /**
-   * @type {Array}
+   *
+   * @param {number} lastSeen
+   * @returns {Promise<GeoTagsResponse>}
    */
-  let tags = await fetch(
-    "/api/geotags?" +
-      new URLSearchParams({
-        latitude,
-        longitude,
-      })
-  ).then((response) => response.json());
+  async function getGeoTags(lastSeen) {
+    await fetch(
+      "/api/geotags?" +
+        new URLSearchParams({
+          latitude,
+          longitude,
+          searchterm: discoverySearch.value,
+          lastSeen,
+        })
+    ).then((response) => response.json());
+  }
+
+  const { latitude, longitude } = await LocationHelper.findLocation();
+  tagData = await getGeoTags();
+  updateDiscovery(latitude, longitude, tagData);
 
   submitGeoTagForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -85,22 +118,13 @@ document.addEventListener("DOMContentLoaded", async () => {
         hashtag,
       }),
     }).then((response) => response.json());
-    tags.push(newTag);
-    updateDiscovery(latitude, longitude, tags);
+    tagData.tags.push(newTag);
+    updateDiscovery(latitude, longitude, tagData);
   });
   submitDiscoveryForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    tags = await fetch(
-      "/api/geotags?" +
-        new URLSearchParams({
-          latitude,
-          longitude,
-          searchterm: discoverySearch.value,
-        })
-    ).then((response) => response.json());
-    updateDiscovery(latitude, longitude, tags);
+    tagData = await getGeoTags();
+    updateDiscovery(latitude, longitude, tagData);
   });
-
-  updateDiscovery(latitude, longitude, tags);
 });

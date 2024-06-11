@@ -32,6 +32,8 @@ const db = new GeoTagStore();
 for (const [name, lat, lon, hashtag] of GeoTagExamples.tagList) {
   db.addGeoTag(name, lat, lon, hashtag);
 }
+
+const pageSize = 4;
 // App routes (A3)
 
 /**
@@ -61,7 +63,7 @@ router.get("/", (req, res) => {
  * If 'latitude' and 'longitude' are available, it will be further filtered based on radius.
  */
 router.get("/api/geotags", (req, res) => {
-  const { searchterm, latitude, longitude } = req.query;
+  const { searchterm, latitude, longitude, lastSeen } = req.query;
 
   let tags;
   if (latitude !== undefined && longitude !== undefined) {
@@ -78,7 +80,46 @@ router.get("/api/geotags", (req, res) => {
     );
   }
 
-  res.send(tags);
+  if (tags.length === 0) {
+    res.send({
+      tags: [],
+      hasNext: false,
+      hastPrev: false,
+      totalTags: 0,
+      page: 0,
+      totalPages: 0,
+    });
+    return;
+  }
+
+  let paginatedTags;
+
+  const lastSeenIndex = tags.findIndex((tag) => tag.id === parseInt(lastSeen));
+  if (lastSeenIndex !== -1) {
+    paginatedTags = tags.slice(lastSeenIndex + 1, lastSeenIndex + 1 + pageSize);
+  } else {
+    paginatedTags = tags.slice(0, pageSize);
+  }
+
+  const lastTagIndex = tags.length - 1;
+  const hasNext =
+    paginatedTags[paginatedTags.length - 1] !== tags[lastTagIndex];
+  const hastPrev = tags[0] !== paginatedTags[0];
+  const page = Math.floor(lastSeenIndex / pageSize);
+
+  res.send({
+    tags: paginatedTags,
+    hasNext,
+    hastPrev,
+    totalTags: tags.length,
+    page,
+    totalPages: Math.ceil(tags.length / pageSize),
+    request: {
+      latitude,
+      longitude,
+      searchterm,
+    },
+  });
 });
 
 /**
