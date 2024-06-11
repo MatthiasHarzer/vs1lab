@@ -46,19 +46,11 @@ const discoveryResults = document.querySelector("#discoveryResults");
 document.addEventListener("DOMContentLoaded", async () => {
   // alert("Please change the script 'geotagging.js'");
   const mapManager = new MapManager();
-  /**
-   * @type {GeoTagsResponse}
-   */
-  let tagData = {
-    tags: [],
-    hasNext: false,
-    hastPrev: false,
-    page: 0,
-    totalPages: 0,
-    totalTags: 0,
-  };
   let lastPage = 0;
   let disableInput = false;
+  const { latitude, longitude } = await LocationHelper.findLocation();
+  let tagData = await getGeoTags();
+  updateDiscovery(tagData);
 
   /**
    * @param {GeoTagsResponse} tagData
@@ -201,9 +193,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     ).then((response) => response.json());
   }
 
-  const { latitude, longitude } = await LocationHelper.findLocation();
-  tagData = await getGeoTags();
-  updateDiscovery(tagData);
 
   submitGeoTagForm.addEventListener("submit", async (e) => {
     e.preventDefault();
