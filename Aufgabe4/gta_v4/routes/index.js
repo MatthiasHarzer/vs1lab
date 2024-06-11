@@ -52,19 +52,12 @@ router.get("/", (req, res) => {
 // API routes (A4)
 
 /**
- * Route '/api/geotags' for HTTP 'GET' requests.
- * (http://expressjs.com/de/4x/api.html#app.get.method)
- *
- * Requests contain the fields of the Discovery form as query.
- * (http://expressjs.com/de/4x/api.html#req.query)
- *
- * As a response, an array with Geo Tag objects is rendered as JrsSON.
- * If 'searchterm' is present, it will be filtered by search term.
- * If 'latitude' and 'longitude' are available, it will be further filtered based on radius.
+ * 
+ * @param {string | undefined} searchterm 
+ * @param {number | undefined} latitude 
+ * @param {number | undefined} longitude 
  */
-router.get("/api/geotags", (req, res) => {
-  const { searchterm, latitude, longitude, lastSeen } = req.query;
-
+const findTags = (searchterm, latitude, longitude) => {
   let tags;
   if (latitude !== undefined && longitude !== undefined) {
     tags = db.getNearbyGeoTags(latitude, longitude);
@@ -80,6 +73,39 @@ router.get("/api/geotags", (req, res) => {
     );
   }
 
+  return tags;
+}
+
+/**
+ * 
+ * @param {Array} tags 
+ * @returns {Array<Array>}
+ */
+const paginate = (tags) => {
+  const paginatedTags = [];
+  for (let i = 0; i < tags.length; i += pageSize) {
+    paginatedTags.push(tags.slice(i, i + pageSize));
+  }
+  return paginatedTags;
+}
+
+/**
+ * Route '/api/geotags' for HTTP 'GET' requests.
+ * (http://expressjs.com/de/4x/api.html#app.get.method)
+ *
+ * Requests contain the fields of the Discovery form as query.
+ * (http://expressjs.com/de/4x/api.html#req.query)
+ *
+ * As a response, an array with Geo Tag objects is rendered as JrsSON.
+ * If 'searchterm' is present, it will be filtered by search term.
+ * If 'latitude' and 'longitude' are available, it will be further filtered based on radius.
+ */
+router.get("/api/geotags", (req, res) => {
+  const { searchterm, latitude, longitude, page } = req.query;
+
+  const tags = findTags(searchterm, latitude, longitude);
+  
+
   if (tags.length === 0) {
     res.send({
       tags: [],
@@ -92,28 +118,17 @@ router.get("/api/geotags", (req, res) => {
     return;
   }
 
-  let paginatedTags;
-
-  const lastSeenIndex = tags.findIndex((tag) => tag.id === parseInt(lastSeen));
-  if (lastSeenIndex !== -1) {
-    paginatedTags = tags.slice(lastSeenIndex + 1, lastSeenIndex + 1 + pageSize);
-  } else {
-    paginatedTags = tags.slice(0, pageSize);
-  }
-
-  const lastTagIndex = tags.length - 1;
-  const hasNext =
-    paginatedTags[paginatedTags.length - 1] !== tags[lastTagIndex];
-  const hastPrev = tags[0] !== paginatedTags[0];
-  const page = Math.floor(lastSeenIndex / pageSize);
+  const pages = paginate(tags);
+  const normalizedPage = Math.max(1, Math.min(page, pages.length)) || 1;
+  const pageTags = pages[normalizedPage - 1];
 
   res.send({
-    tags: paginatedTags,
-    hasNext,
-    hastPrev,
+    tags: pageTags,
+    hasNext: normalizedPage < pages.length,
+    hastPrev: normalizedPage > 1,
     totalTags: tags.length,
-    page,
-    totalPages: Math.ceil(tags.length / pageSize),
+    page: normalizedPage,
+    totalPages: pages.length,
     request: {
       latitude,
       longitude,

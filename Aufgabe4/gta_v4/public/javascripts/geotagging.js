@@ -71,32 +71,69 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     discoveryResults.innerHTML = "";
 
+    if (tags.length === 0) {
+      return;
+    }
+
+    const lastTag = tags[tags.length - 1];
+
     for (const tag of tags) {
       const tagElement = document.createElement("li");
       tagElement.textContent = `${tag.name} (${tag.location.latitude}, ${tag.location.longitude}) ${tag.hashtag}`;
       discoveryResults.appendChild(tagElement);
     }
+
+    const paginationElement = document.createElement("div");
+    paginationElement.classList.add("pagination");
+
+    const prevButton = document.createElement("button");
+    prevButton.textContent = "<";
+    prevButton.disabled = !hastPrev;
+
+    const nextButton = document.createElement("button");
+    nextButton.textContent = ">";
+    nextButton.disabled = !hasNext;
+
+    const pageElement = document.createElement("span");
+    pageElement.textContent = `Page ${page} of ${totalPages} (${totalTags})`;
+
+    paginationElement.appendChild(prevButton);
+    paginationElement.appendChild(pageElement);
+    paginationElement.appendChild(nextButton);
+
+    discoveryResults.insertBefore(paginationElement, discoveryResults.firstChild);
+
+    prevButton.onclick = async () => {
+      tagData = await getGeoTags(tagData.page - 1);
+      updateDiscovery(latitude, longitude, tagData);
+    }
+    nextButton.onclick = async () => {
+      tagData = await getGeoTags(tagData.page + 1);
+      updateDiscovery(latitude, longitude, tagData);
+    }
+
   }
 
   /**
    *
-   * @param {number} lastSeen
+   * @param {number} page
    * @returns {Promise<GeoTagsResponse>}
    */
-  async function getGeoTags(lastSeen) {
-    await fetch(
+  async function getGeoTags(page) {
+    return await fetch(
       "/api/geotags?" +
         new URLSearchParams({
           latitude,
           longitude,
           searchterm: discoverySearch.value,
-          lastSeen,
+          page,
         })
     ).then((response) => response.json());
   }
 
   const { latitude, longitude } = await LocationHelper.findLocation();
   tagData = await getGeoTags();
+  console.log(tagData);
   updateDiscovery(latitude, longitude, tagData);
 
   submitGeoTagForm.addEventListener("submit", async (e) => {

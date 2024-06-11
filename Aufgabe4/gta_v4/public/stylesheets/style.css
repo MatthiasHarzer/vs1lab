@@ -247,3 +247,37 @@ footer {
     }
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+
+  button {
+    padding: 5px;
+    background-color: #744097;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+
+    &:disabled {
+      background-color: #cdcdcd;
+      cursor: not-allowed;
+    }
+  }
+}
