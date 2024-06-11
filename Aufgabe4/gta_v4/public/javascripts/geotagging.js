@@ -152,7 +152,6 @@ document.addEventListener("DOMContentLoaded", async () => {
    */
   async function updateDiscovery(tagData) {
     const { tags } = tagData;
-    console.log(tagData)
     mapManager.initMap(latitude, longitude);
     mapManager.updateMarkers(latitude, longitude, tags);
 
