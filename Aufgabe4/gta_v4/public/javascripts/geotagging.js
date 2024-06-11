@@ -99,12 +99,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     prevButton.onclick = async () => {
       if (disableInput) return;
-      tagData = await getGeoTags(tagData.page - 1);
+      tagData = await getGeoTags(tagData.page - 1, tagData.request.searchterm);
       updateDiscovery(tagData);
     }
     nextButton.onclick = async () => {
       if (disableInput) return;
-      tagData = await getGeoTags(tagData.page + 1);
+      tagData = await getGeoTags(tagData.page + 1, tagData.request.searchterm);
       updateDiscovery(tagData);
     }
 
@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     });
 
-    
+
   }
 
   /**
@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     mapManager.initMap(latitude, longitude);
     mapManager.updateMarkers(latitude, longitude, tags);
 
-    
+
 
     if (tags.length === 0) {
       return;
@@ -180,16 +180,18 @@ document.addEventListener("DOMContentLoaded", async () => {
    * @param {number} page
    * @returns {Promise<GeoTagsResponse>}
    */
-  async function getGeoTags(page) {
-    return await fetch(
+  async function getGeoTags(page, searchterm = "") {
+    const response = await fetch(
       "/api/geotags?" +
-        new URLSearchParams({
-          latitude,
-          longitude,
-          searchterm: discoverySearch.value,
-          page,
-        })
-    ).then((response) => response.json());
+      new URLSearchParams({
+        latitude,
+        longitude,
+        searchterm,
+        page,
+      })
+    );
+
+    return response.json();
   }
 
 
@@ -199,7 +201,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const name = nameElement.value;
     const hashtag = hashtagElement.value;
 
-    const newTag = await fetch("/api/geotags", {
+    const response = await fetch("/api/geotags", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -211,14 +213,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         longitude,
         hashtag,
       }),
-    }).then((response) => response.json());
+    });
+    const newTag = response.json();
     tagData.tags.push(newTag);
     updateDiscovery(tagData);
   });
   submitDiscoveryForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    tagData = await getGeoTags();
+    tagData = await getGeoTags(null, discoverySearch.value);
     updateDiscovery(tagData);
   });
 });
