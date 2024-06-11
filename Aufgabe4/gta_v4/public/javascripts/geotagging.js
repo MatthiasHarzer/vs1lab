@@ -57,30 +57,31 @@ document.addEventListener("DOMContentLoaded", async () => {
     totalPages: 0,
     totalTags: 0,
   };
+  let lastPage = 0;
+  let disableInput = false;
 
   /**
-   *
-   * @param {number} latitude
-   * @param {number} longitude
    * @param {GeoTagsResponse} tagData
    */
-  function updateDiscovery(latitude, longitude, tagData) {
+  function buildPage(tagData) {
     const { tags, hasNext, hastPrev, page, totalPages, totalTags } = tagData;
-    mapManager.initMap(latitude, longitude);
-    mapManager.updateMarkers(latitude, longitude, tags);
-
-    discoveryResults.innerHTML = "";
 
     if (tags.length === 0) {
-      return;
+      return document.createElement("div");
     }
 
-    const lastTag = tags[tags.length - 1];
+    const wrapperElement = document.createElement("div");
+    wrapperElement.classList.add("page-wrapper");
+    wrapperElement.id = "pageWrapper";
+
+    const animationWrapper = document.createElement("div");
+    animationWrapper.classList.add("animation-wrapper");
+    animationWrapper.id = "animationWrapper";
 
     for (const tag of tags) {
       const tagElement = document.createElement("li");
       tagElement.textContent = `${tag.name} (${tag.location.latitude}, ${tag.location.longitude}) ${tag.hashtag}`;
-      discoveryResults.appendChild(tagElement);
+      animationWrapper.appendChild(tagElement);
     }
 
     const paginationElement = document.createElement("div");
@@ -101,17 +102,86 @@ document.addEventListener("DOMContentLoaded", async () => {
     paginationElement.appendChild(pageElement);
     paginationElement.appendChild(nextButton);
 
-    discoveryResults.insertBefore(paginationElement, discoveryResults.firstChild);
+    wrapperElement.appendChild(paginationElement);
+    wrapperElement.appendChild(animationWrapper);
 
     prevButton.onclick = async () => {
+      if (disableInput) return;
       tagData = await getGeoTags(tagData.page - 1);
-      updateDiscovery(latitude, longitude, tagData);
+      updateDiscovery(tagData);
     }
     nextButton.onclick = async () => {
+      if (disableInput) return;
       tagData = await getGeoTags(tagData.page + 1);
-      updateDiscovery(latitude, longitude, tagData);
+      updateDiscovery(tagData);
     }
 
+    return wrapperElement;
+  }
+
+  /**
+   * 
+   * @param {HTMLElement} pageElement 
+   * @param {'left' | 'right'} direction 
+   * @returns 
+   */
+  function animateToPage(pageElement, direction) {
+    const pageWrapper = document.getElementById("pageWrapper");
+    const animationWrapper = document.getElementById("animationWrapper");
+    const pagination = document.querySelector(".pagination");
+
+
+    if (!animationWrapper || !pageWrapper) {
+      discoveryResults.innerHTML = "";
+      discoveryResults.appendChild(pageElement);
+      return;
+    }
+    pagination.style.visibility = "hidden";
+    animationWrapper.id = undefined;
+    discoveryResults.appendChild(pageElement);
+
+    const pageAnimationWrapper = pageElement.querySelector(".animation-wrapper");
+
+    animationWrapper.style.animationName = `page-animation-out-${direction}`;
+    pageAnimationWrapper.style.animationName = `page-animation-in-${direction}`;
+
+    return new Promise((resolve) => {
+      animationWrapper.addEventListener("animationend", () => {
+        pageWrapper.remove();
+        resolve();
+      });
+    });
+
+    
+  }
+
+  /**
+   * @param {GeoTagsResponse} tagData
+   */
+  async function updateDiscovery(tagData) {
+    const { tags } = tagData;
+    console.log(tagData)
+    mapManager.initMap(latitude, longitude);
+    mapManager.updateMarkers(latitude, longitude, tags);
+
+    
+
+    if (tags.length === 0) {
+      return;
+    }
+
+    const animatonDirection = tagData.page < lastPage ? "left" : "right";
+
+    const page = buildPage(tagData);
+
+    disableInput = true;
+    await animateToPage(page, animatonDirection)
+    disableInput = false;
+
+    // discoveryResults.innerHTML = "";
+    // discoveryResults.appendChild(page);
+
+    lastPage = tagData.page;
   }
 
   /**
@@ -133,8 +203,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const { latitude, longitude } = await LocationHelper.findLocation();
   tagData = await getGeoTags();
-  console.log(tagData);
-  updateDiscovery(latitude, longitude, tagData);
+  updateDiscovery(tagData);
 
   submitGeoTagForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -156,12 +225,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       }),
     }).then((response) => response.json());
     tagData.tags.push(newTag);
-    updateDiscovery(latitude, longitude, tagData);
+    updateDiscovery(tagData);
   });
   submitDiscoveryForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
     tagData = await getGeoTags();
-    updateDiscovery(latitude, longitude, tagData);
+    updateDiscovery(tagData);
   });
 });

@@ -194,13 +194,15 @@ footer {
   padding: 1rem;
 
   .discovery__taglist {
+    overflow: hidden;
     .discovery__results {
       display: flex;
       flex-direction: column;
       flex-wrap: wrap;
       list-style: none;
+      position: relative;
 
-      & > li {
+      li {
         flex: 1 1 auto;
         padding: 1rem;
         border: 1px solid #744097;
@@ -279,5 +281,59 @@ footer {
       background-color: #cdcdcd;
       cursor: not-allowed;
     }
+  }
+}
+.page-wrapper{
+  position: absolute;
+}
+.animation-wrapper{
+  animation-duration: 0.5s;
+  animation-timing-function: ease-in-out;
+}
+
+:root {
+  --page-animation-translate: 120%;
+  --page-animation-scale: 0.8;
+}
+
+@keyframes page-animation-in-left {
+  from {
+    transform: translateX(calc(-1 * var(--page-animation-translate)));
+    scale: var(--page-animation-scale);
+  }
+  to {
+    transform: translateX(0);
+    scale: 1;
+  }
+}
+@keyframes page-animation-out-left {
+  from {
+    transform: translateX(0);
+    scale: 1;
+  }
+  to {
+    transform: translateX( var(--page-animation-translate));
+    scale: var(--page-animation-scale);
+  }
+}
+
+@keyframes page-animation-in-right {
+  from {
+    transform: translateX( var(--page-animation-translate));
+    scale: var(--page-animation-scale);
+  }
+  to {
+    transform: translateX(0);
+    scale: 1;
+  }
+}
+@keyframes page-animation-out-right {
+  from {
+    transform: translateX(0);
+    scale: 1;
+  }
+  to {
+    transform: translateX(calc(-1 * var(--page-animation-translate)));
+    scale: var(--page-animation-scale);
   }
 }
