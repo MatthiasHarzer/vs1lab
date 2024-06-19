@@ -101,27 +101,26 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (disableInput) return;
       tagData = await getGeoTags(tagData.page - 1, tagData.request.searchterm);
       updateDiscovery(tagData);
-    }
+    };
     nextButton.onclick = async () => {
       if (disableInput) return;
       tagData = await getGeoTags(tagData.page + 1, tagData.request.searchterm);
       updateDiscovery(tagData);
-    }
+    };
 
     return wrapperElement;
   }
 
   /**
-   * 
-   * @param {HTMLElement} pageElement 
-   * @param {'left' | 'right'} direction 
-   * @returns 
+   *
+   * @param {HTMLElement} pageElement
+   * @param {'left' | 'right'} direction
+   * @returns
    */
   function animateToPage(pageElement, direction) {
     const pageWrapper = document.getElementById("pageWrapper");
     const animationWrapper = document.getElementById("animationWrapper");
     const pagination = document.querySelector(".pagination");
-
 
     if (!animationWrapper || !pageWrapper) {
       discoveryResults.innerHTML = "";
@@ -132,7 +131,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     animationWrapper.id = undefined;
     discoveryResults.appendChild(pageElement);
 
-    const pageAnimationWrapper = pageElement.querySelector(".animation-wrapper");
+    const pageAnimationWrapper =
+      pageElement.querySelector(".animation-wrapper");
 
     animationWrapper.style.animationName = `page-animation-out-${direction}`;
     pageAnimationWrapper.style.animationName = `page-animation-in-${direction}`;
@@ -143,19 +143,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         resolve();
       });
     });
-
-
   }
 
   /**
    * @param {GeoTagsResponse} tagData
+   * @param {boolean} [noAnimation=false]
    */
-  async function updateDiscovery(tagData) {
+  async function updateDiscovery(tagData, noAnimation = false) {
     const { tags } = tagData;
     mapManager.initMap(latitude, longitude);
     mapManager.updateMarkers(latitude, longitude, tags);
-
-
 
     if (tags.length === 0) {
       return;
@@ -165,12 +162,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const page = buildPage(tagData);
 
-    disableInput = true;
-    await animateToPage(page, animatonDirection)
-    disableInput = false;
-
-    // discoveryResults.innerHTML = "";
-    // discoveryResults.appendChild(page);
+    if (noAnimation) {
+      discoveryResults.innerHTML = "";
+      discoveryResults.appendChild(page);
+    } else {
+      disableInput = true;
+      await animateToPage(page, animatonDirection);
+      disableInput = false;
+    }
 
     lastPage = tagData.page;
   }
@@ -183,17 +182,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   async function getGeoTags(page, searchterm = "") {
     const response = await fetch(
       "/api/geotags?" +
-      new URLSearchParams({
-        latitude,
-        longitude,
-        searchterm,
-        page,
-      })
+        new URLSearchParams({
+          latitude,
+          longitude,
+          searchterm,
+          page,
+        })
     );
 
     return response.json();
   }
-
 
   submitGeoTagForm.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -214,9 +212,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         hashtag,
       }),
     });
-    const newTag = response.json();
-    tagData.tags.push(newTag);
-    updateDiscovery(tagData);
+    const newTag = await response.json();
+    tagData = await getGeoTags();
+    updateDiscovery(tagData, true);
   });
   submitDiscoveryForm.addEventListener("submit", async (e) => {
     e.preventDefault();
