@@ -49,8 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let lastPage = 0;
   let disableInput = false;
   const { latitude, longitude } = await LocationHelper.findLocation();
-  let tagData = await getGeoTags();
-  updateDiscovery(tagData);
+  updateDiscovery(await getGeoTags());
 
   /**
    * @param {GeoTagsResponse} tagData
@@ -213,13 +212,13 @@ document.addEventListener("DOMContentLoaded", async () => {
       }),
     });
     const newTag = await response.json();
-    tagData = await getGeoTags();
+    const tagData = await getGeoTags();
     updateDiscovery(tagData, true);
   });
   submitDiscoveryForm.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    tagData = await getGeoTags(null, discoverySearch.value);
+    const tagData = await getGeoTags(null, discoverySearch.value);
     updateDiscovery(tagData);
   });
 });
