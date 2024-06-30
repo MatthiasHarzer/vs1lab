@@ -219,6 +219,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     e.preventDefault();
 
     const tagData = await getGeoTags(null, discoverySearch.value);
-    updateDiscovery(tagData);
+    updateDiscovery(tagData, true);
   });
 });
