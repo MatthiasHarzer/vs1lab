@@ -84,9 +84,8 @@ class InMemoryGeoTagStore {
     return this.#tags.filter((tag) => {
       const latDiff = Math.abs(tag.location.latitude - latitude);
       const lonDiff = Math.abs(tag.location.longitude - longitude);
-      return (
-        latDiff <= this.#proximityDistance && lonDiff < this.#proximityDistance
-      );
+      const distance = Math.sqrt(latDiff ** 2 + lonDiff ** 2);
+      return distance <= this.#proximityDistance;
     });
   }
 
